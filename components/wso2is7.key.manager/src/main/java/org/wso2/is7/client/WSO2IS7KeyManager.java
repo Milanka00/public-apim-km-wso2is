@@ -151,6 +151,7 @@ public class WSO2IS7KeyManager extends AbstractKeyManager {
     private static final String REMOTE_CLAIM = "remoteClaim";
     private static final String LOCAL_CLAIM = "localClaim";
     private static final long USER_SCHEMA_CACHE_EXPIRY = 3600L;
+    private static final String applicationSpNameSystemProp = System.getProperty("sp.name.application");
 
     // Name of the default API Resource of WSO2 IS7 - which is used to contain scopes.
     private static final String DEFAULT_OAUTH_2_RESOURCE_IDENTIFIER = "User-defined-oauth2-resource";
@@ -203,6 +204,15 @@ public class WSO2IS7KeyManager extends AbstractKeyManager {
         String applicationName = oAuthApplicationInfo.getClientName();
         String oauthClientName = oauthAppRequest.getOAuthApplicationInfo().getApplicationUUID();
         String keyType = (String) oAuthApplicationInfo.getParameter(ApplicationConstants.APP_KEY_TYPE);
+
+        // Added to use the application name as part of sp name instead of application UUID when specified
+        if (Boolean.parseBoolean(applicationSpNameSystemProp)) {
+            oauthClientName = oAuthApplicationInfo.getClientName();
+            if (log.isDebugEnabled() && oauthClientName != null) {
+                log.debug("Using application name " + oauthClientName
+                                + " as Service Provider name for OAuth client creation");
+            }
+        }
 
         if (StringUtils.isNotEmpty(applicationName) && StringUtils.isNotEmpty(keyType)) {
             String domain = UserCoreUtil.extractDomainFromName(userId);
@@ -428,6 +438,15 @@ public class WSO2IS7KeyManager extends AbstractKeyManager {
         String applicationName = oAuthApplicationInfo.getClientName();
         String oauthClientName = oAuthApplicationInfo.getApplicationUUID();
         String keyType = (String) oAuthApplicationInfo.getParameter(ApplicationConstants.APP_KEY_TYPE);
+
+        // Added to use the application name as part of sp name instead of application UUID when specified
+        if (Boolean.parseBoolean(applicationSpNameSystemProp)) {
+            oauthClientName = oAuthApplicationInfo.getClientName();
+            if (log.isDebugEnabled() && oauthClientName != null) {
+                log.debug("Using application name " + oauthClientName
+                        + " as Service Provider name for OAuth client update");
+            }
+        }
 
         // First we attempt to get the tenant domain from the userID and if it is not possible, we fetch it
         // from the ThreadLocalCarbonContext
