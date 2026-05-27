@@ -1247,7 +1247,7 @@ public class WSO2IS7KeyManager extends AbstractKeyManager {
                 Set<String> existingScopeNames = getExistingWSO2IS7ScopeNames(wso2IS7APIResourceId);
                 nonExistingWSO2IS7Scopes = getNonExistingWSO2IS7Scopes(newScopes, existingScopeNames);
                 addScopesToWSO2IS7APIResource(wso2IS7APIResourceId, nonExistingWSO2IS7Scopes);
-                updateExistingWSO2IS7Scopes(wso2IS7APIResourceId, newScopes, existingScopeNames);
+                removeStaleRoleBindingsAndUpdateExistingScopes(wso2IS7APIResourceId, newScopes, existingScopeNames);
             } catch (KeyManagerClientException e) {
                 handleException("Failed to add scopes to WSO2 IS7 API Resource: " +
                         DEFAULT_OAUTH_2_RESOURCE_IDENTIFIER, e);
@@ -1304,8 +1304,9 @@ public class WSO2IS7KeyManager extends AbstractKeyManager {
     }
 
     /**
-     * Updates display name and description of scopes already in the IS7 API resource, and removes
-     * role-to-scope bindings that are no longer assigned in APIM. New bindings are added afterward by
+     * Removes role-to-scope bindings that are no longer assigned in APIM, and updates
+     * display name and description of already existing scopes.
+     * New bindings are added afterward by
      * {@link #createWSO2IS7RoleToScopeBindings}.
      *
      * @param wso2IS7APIResourceId   ID of the {@link #DEFAULT_OAUTH_2_RESOURCE_IDENTIFIER}
@@ -1314,7 +1315,7 @@ public class WSO2IS7KeyManager extends AbstractKeyManager {
      * @throws KeyManagerClientException Failed to patch scope metadata in IS7
      * @throws APIManagementException    Failed to remove stale role-to-scope bindings
      */
-    private void updateExistingWSO2IS7Scopes(String wso2IS7APIResourceId, Set<Scope> scopes,
+    private void removeStaleRoleBindingsAndUpdateExistingScopes(String wso2IS7APIResourceId, Set<Scope> scopes,
                                              Set<String> existingScopeNames)
             throws KeyManagerClientException, APIManagementException {
 
